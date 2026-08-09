@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "username": "demo",
+    "password": "demo123",
+    "banquetId": 1,
+    "enabled": true,
+    "expiresAt": "2026-12-31T23:59:59.000Z",
+    "maxConnections": 1,
+    "createdAt": "2026-08-08T00:00:00.000Z"
+  },
+  {
+    "id": 2,
+    "username": "adeel",
+    "password": "adeel",
+    "banquetId": 4,
+    "enabled": true,
+    "expiresAt": "2026-08-25T22:15:00.000Z",
+    "maxConnections": 3,
+    "createdAt": "2026-08-08T22:15:47.387Z"
+  },
+  {
+    "id": 3,
+    "username": "shaz",
+    "password": "shaz",
+    "banquetId": 1,
+    "enabled": true,
+    "expiresAt": null,
+    "maxConnections": 5,
+    "createdAt": "2026-08-09T13:36:37.687Z"
+  }
+]

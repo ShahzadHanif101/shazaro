@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "name": "News",
+    "enabled": true,
+    "createdAt": "2026-08-08T00:00:00.000Z"
+  },
+  {
+    "id": 2,
+    "name": "Sports",
+    "enabled": true,
+    "createdAt": "2026-08-08T00:00:00.000Z"
+  },
+  {
+    "id": 3,
+    "name": "Kids",
+    "enabled": true,
+    "createdAt": "2026-08-08T00:00:00.000Z"
+  },
+  {
+    "id": 4,
+    "name": "Entertainment",
+    "enabled": true,
+    "createdAt": "2026-08-08T00:00:00.000Z"
+  },
+  {
+    "id": 5,
+    "name": "Adult",
+    "enabled": true,
+    "createdAt": "2026-08-08T00:00:00.000Z"
+  },
+  {
+    "id": 6,
+    "name": "Cricket Sports",
+    "enabled": true,
+    "createdAt": "2026-08-08T21:24:28.199Z"
+  }
+]
