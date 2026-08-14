@@ -87,11 +87,18 @@ function generateM3U(
   // Build M3U content
   let m3u = "#EXTM3U\n";
   
-  // ✅ Add expiry info as comment (optional)
+  // ✅ FIX: Only add expiry info if expiresAt exists
   if (user.expiresAt) {
-    const expiry = new Date(user.expiresAt);
-    const expTimestamp = Math.floor(expiry.getTime() / 1000);
-    m3u += `# Expires: ${expiry.toISOString()} (${expTimestamp})\n`;
+    try {
+      const expiry = new Date(user.expiresAt);
+      // Check if date is valid
+      if (!isNaN(expiry.getTime())) {
+        const expTimestamp = Math.floor(expiry.getTime() / 1000);
+        m3u += `# Expires: ${expiry.toISOString()} (${expTimestamp})\n`;
+      }
+    } catch (error) {
+      console.warn("[SHAZARO GET] Invalid expiry date:", user.expiresAt);
+    }
   }
   
   // Welcome stream
@@ -125,6 +132,12 @@ export async function GET(request: Request) {
     const password = searchParams.get("password") ?? "";
     const type = searchParams.get("type") ?? "";
     const streamId = Number(searchParams.get("stream") || searchParams.get("stream_id") || "0");
+
+    // =====================================================
+    // LOG THE REQUEST FOR DEBUGGING
+    // =====================================================
+    
+    console.log(`[GET] Request: username=${username}, streamId=${streamId}, type=${type}`);
 
     // =====================================================
     // BASIC VALIDATION
@@ -248,7 +261,7 @@ export async function GET(request: Request) {
     }
 
     // =====================================================
-    // ✅ REDIRECT TO ORIGINAL STREAM URL
+    // REDIRECT TO ORIGINAL STREAM URL
     // =====================================================
 
     console.log(`[SHAZARO GET] ✅ Redirecting stream ${streamId} to: ${channel.streamUrl}`);
