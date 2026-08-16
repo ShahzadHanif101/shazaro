@@ -27,6 +27,56 @@ export async function POST(request: Request) {
       );
     }
 
+    // =====================================================
+    // PRODUCTION: Use Vercel Environment Variables
+    // =====================================================
+
+    if (process.env.NODE_ENV === "production") {
+      const adminUsername = process.env.SHAZARO_ADMIN_USERNAME;
+      const adminPassword = process.env.SHAZARO_ADMIN_PASSWORD;
+
+      if (!adminUsername || !adminPassword) {
+        console.error(
+          "SHAZARO admin environment variables are not configured."
+        );
+
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Admin authentication is not configured.",
+          },
+          { status: 500 }
+        );
+      }
+
+      if (
+        username !== adminUsername ||
+        password !== adminPassword
+      ) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Invalid username or password.",
+          },
+          { status: 401 }
+        );
+      }
+
+      await createSession(username);
+
+      return NextResponse.json({
+        success: true,
+        message: "Login successful.",
+        user: {
+          username,
+        },
+      });
+    }
+
+    // =====================================================
+    // DEVELOPMENT: Use data/users.json
+    // =====================================================
+
     const filePath = path.join(
       process.cwd(),
       "data",
