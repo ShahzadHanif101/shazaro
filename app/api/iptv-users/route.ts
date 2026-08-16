@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { readData, writeData } from "@/lib/data";
-import type { Banquet, IPTVUser } from "@/lib/types";
+import type { Banquet, IptvUser } from "@/lib/types";
 
 const USERS_FILE = "iptv-users.json";
 const BANQUET_FILE = "banquet.json";
 
 export async function GET() {
   try {
-    const users = await readData<IPTVUser[]>(USERS_FILE);
+    const users = await readData<IptvUser[]>(USERS_FILE);
 
     return NextResponse.json(users);
   } catch (error) {
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    const users = await readData<IPTVUser[]>(USERS_FILE);
+    const users = await readData<IptvUser[]>(USERS_FILE);
     const banquets = await readData<Banquet[]>(BANQUET_FILE);
 
     /*
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
      * =====================================================
      */
 
-    const newUser: IPTVUser = {
+    const newUser: IptvUser = {
       id:
         users.length > 0
           ? Math.max(...users.map((user) => user.id)) + 1

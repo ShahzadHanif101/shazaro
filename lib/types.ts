@@ -13,6 +13,7 @@ export interface IptvUser {
   enabled: boolean;
   expiresAt: string | null;
   maxConnections: number;
+  createdAt: string;
 }
 
 export interface Channel {
