@@ -20,33 +20,36 @@ export default function SettingsPage() {
 
       <div className="space-y-6">
         {/* =====================================================
-            GENERAL
+            FIND & REPLACE
         ===================================================== */}
         <section className="rounded-xl border border-slate-800 bg-slate-900">
           <div className="border-b border-slate-800 px-6 py-5">
-            <h2 className="text-lg font-semibold text-white">General</h2>
+            <h2 className="text-lg font-semibold text-white">Find & Replace</h2>
 
             <p className="mt-1 text-sm text-slate-400">
-              Basic SHAZARO configuration.
+              Find and replace values in SHAZARO JSON data.
             </p>
           </div>
 
           <div className="p-6">
-            <div className="max-w-xl">
-              <label className="mb-2 block text-sm font-medium text-slate-300">
-                Site Name
-              </label>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="font-medium text-white">
+                  JSON Data Find & Replace
+                </h3>
 
-              <input
-                type="text"
-                value="SHAZARO"
-                readOnly
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none"
-              />
+                <p className="mt-1 text-sm text-slate-500">
+                  Preview and safely replace values in selected JSON fields.
+                </p>
+              </div>
 
-              <p className="mt-2 text-xs text-slate-500">
-                Site name configuration will be added in a future step.
-              </p>
+              <button
+                type="button"
+                onClick={() => router.push("/admin/settings/data/find-replace")}
+                className="rounded-lg border border-cyan-500/30 px-4 py-2 text-sm font-medium text-cyan-400 transition hover:border-cyan-500/60 hover:bg-cyan-500/10 hover:text-cyan-300"
+              >
+                Open Find & Replace
+              </button>
             </div>
           </div>
         </section>
