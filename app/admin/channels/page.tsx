@@ -12,7 +12,6 @@ export default function ChannelsPage() {
   const [editingChannel, setEditingChannel] = useState<Channel | null>(null);
   const [form, setForm] = useState({
     name: "",
-    streamId: "",
     stream_type: "live" as Channel["stream_type"],
     streamUrl: "",
     logoUrl: "",
@@ -72,12 +71,48 @@ export default function ChannelsPage() {
     }
   }
 
+  async function handleToggleEnabled(channel: Channel) {
+    const action = channel.enabled ? "disable" : "enable";
+
+    if (
+      channel.enabled &&
+      !window.confirm(`Are you sure you want to disable "${channel.name}"?`)
+    ) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/channels/${channel.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: channel.name,
+          stream_type: channel.stream_type,
+          streamUrl: channel.streamUrl,
+          logoUrl: channel.logoUrl,
+          categoryId: channel.categoryId,
+          enabled: !channel.enabled,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to ${action} channel`);
+      }
+
+      await loadData();
+    } catch (error) {
+      console.error(`${action} channel failed:`, error);
+      alert(`Failed to ${action} channel.`);
+    }
+  }
+
   function handleEdit(channel: Channel) {
     setEditingChannel(channel);
 
     setForm({
       name: channel.name,
-      streamId: String(channel.streamId),
       stream_type: channel.stream_type,
       streamUrl: channel.streamUrl,
       logoUrl: channel.logoUrl,
@@ -101,7 +136,6 @@ export default function ChannelsPage() {
           },
           body: JSON.stringify({
             name: form.name,
-            streamId: Number(form.streamId),
             stream_type: form.stream_type,
             streamUrl: form.streamUrl,
             logoUrl: form.logoUrl,
@@ -124,7 +158,6 @@ export default function ChannelsPage() {
 
       setForm({
         name: "",
-        streamId: "",
         stream_type: "live",
         streamUrl: "",
         logoUrl: "",
@@ -288,6 +321,7 @@ export default function ChannelsPage() {
 
                       <td className="px-5 py-4 text-right">
                         <div className="flex justify-end gap-3">
+                          {/* Edit */}
                           <button
                             type="button"
                             onClick={() => handleEdit(channel)}
@@ -296,6 +330,20 @@ export default function ChannelsPage() {
                             Edit
                           </button>
 
+                          {/* Enable / Disable */}
+                          <button
+                            type="button"
+                            onClick={() => handleToggleEnabled(channel)}
+                            className={
+                              channel.enabled
+                                ? "rounded-lg border border-amber-500/30 px-3 py-1.5 text-sm font-medium text-amber-400 transition hover:border-amber-500/60 hover:bg-amber-500/10 hover:text-amber-300"
+                                : "rounded-lg border border-emerald-500/30 px-3 py-1.5 text-sm font-medium text-emerald-400 transition hover:border-emerald-500/60 hover:bg-emerald-500/10 hover:text-emerald-300"
+                            }
+                          >
+                            {channel.enabled ? "Disable" : "Enable"}
+                          </button>
+
+                          {/* Delete */}
                           <button
                             type="button"
                             onClick={() => handleDelete(channel.id)}
@@ -362,22 +410,6 @@ export default function ChannelsPage() {
                 </div>
 
                 {/* Stream ID */}
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-slate-300">
-                    Stream ID
-                  </label>
-
-                  <input
-                    type="number"
-                    required
-                    value={form.streamId}
-                    onChange={(event) =>
-                      updateForm("streamId", event.target.value)
-                    }
-                    placeholder="1001"
-                    className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-cyan-500"
-                  />
-                </div>
 
                 {/* Stream Type */}
                 <div>

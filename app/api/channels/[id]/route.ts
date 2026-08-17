@@ -33,7 +33,6 @@ export async function PUT(
     const updatedChannel: Channel = {
       ...channels[index],
       name: body.name,
-      streamId: Number(body.streamId),
       stream_type: body.stream_type,
       streamUrl: body.streamUrl,
       logoUrl: body.logoUrl ?? "",

@@ -25,14 +25,20 @@ export async function POST(request: Request) {
 
     const channels = await readData<Channel[]>(FILE_NAME);
 
-    const newChannel: Channel = {
-      id:
-        channels.length > 0
-          ? Math.max(...channels.map((channel) => channel.id)) + 1
-          : 1,
+    const newId =
+      channels.length > 0
+        ? Math.max(...channels.map((channel) => channel.id)) + 1
+        : 1;
 
+    const newStreamId =
+      channels.length > 0
+        ? Math.max(...channels.map((channel) => channel.streamId)) + 1
+        : 1001;
+
+    const newChannel: Channel = {
+      id: newId,
       name: body.name,
-      streamId: Number(body.streamId),
+      streamId: newStreamId,
       stream_type: body.stream_type,
       streamUrl: body.streamUrl,
       logoUrl: body.logoUrl ?? "",
