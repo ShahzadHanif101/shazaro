@@ -5,6 +5,8 @@ import type { Channel, Category } from "@/lib/types";
 
 export default function ChannelsPage() {
   const [channels, setChannels] = useState<Channel[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [copiedStreamUrl, setCopiedStreamUrl] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -207,6 +209,20 @@ export default function ChannelsPage() {
           CHANNEL LIST
       ===================================================== */}
       <section className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900">
+        {/* =====================================================
+    CHANNEL SEARCH
+===================================================== */}
+        {!loading && channels.length > 0 && (
+          <div className="border-b border-slate-800 p-4">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Search channel name..."
+              className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-cyan-500"
+            />
+          </div>
+        )}
         {loading ? (
           <div className="p-8 text-center text-sm text-slate-400">
             Loading channels...
@@ -237,6 +253,10 @@ export default function ChannelsPage() {
                   </th>
 
                   <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    Stream URL
+                  </th>
+
+                  <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wider text-slate-400">
                     Type
                   </th>
 
@@ -255,107 +275,132 @@ export default function ChannelsPage() {
               </thead>
 
               <tbody className="divide-y divide-slate-800">
-                {channels.map((channel) => {
-                  const category = categories.find(
-                    (item) => item.id === channel.categoryId,
-                  );
+                {channels
+                  .filter((channel) =>
+                    channel.name
+                      .toLowerCase()
+                      .includes(searchQuery.toLowerCase()),
+                  )
+                  .map((channel) => {
+                    const category = categories.find(
+                      (item) => item.id === channel.categoryId,
+                    );
 
-                  return (
-                    <tr
-                      key={channel.id}
-                      className="transition hover:bg-slate-800/40"
-                    >
-                      <td className="px-5 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-700 bg-slate-950">
-                            {channel.logoUrl ? (
-                              <img
-                                src={channel.logoUrl}
-                                alt=""
-                                className="h-full w-full object-contain"
-                              />
-                            ) : (
-                              <span className="text-xs font-bold text-slate-500">
-                                TV
-                              </span>
-                            )}
+                    return (
+                      <tr
+                        key={channel.id}
+                        className="transition hover:bg-slate-800/40"
+                      >
+                        <td className="px-5 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-700 bg-slate-950">
+                              {channel.logoUrl ? (
+                                <img
+                                  src={channel.logoUrl}
+                                  alt=""
+                                  className="h-full w-full object-contain"
+                                />
+                              ) : (
+                                <span className="text-xs font-bold text-slate-500">
+                                  TV
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="min-w-0">
+                              <p className="truncate font-medium text-white">
+                                {channel.name}
+                              </p>
+
+                              <p className="text-xs text-slate-500">
+                                ID: {channel.id}
+                              </p>
+                            </div>
                           </div>
+                        </td>
 
-                          <div className="min-w-0">
-                            <p className="truncate font-medium text-white">
-                              {channel.name}
-                            </p>
+                        <td className="px-5 py-4 text-sm text-slate-300">
+                          {channel.streamId}
+                        </td>
+                        <td className="px-4 py-3">
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              await navigator.clipboard.writeText(
+                                channel.streamUrl,
+                              );
+                              setCopiedStreamUrl(channel.streamUrl);
 
-                            <p className="text-xs text-slate-500">
-                              ID: {channel.id}
-                            </p>
+                              setTimeout(() => {
+                                setCopiedStreamUrl(null);
+                              }, 1500);
+                            }}
+                            className="rounded-lg border border-cyan-500/30 px-3 py-1.5 text-xs font-medium text-cyan-400 transition hover:border-cyan-500/60 hover:bg-cyan-500/10 hover:text-cyan-300"
+                          >
+                            {copiedStreamUrl === channel.streamUrl
+                              ? "Stream Copied!"
+                              : "Copy Stream"}
+                          </button>
+                        </td>
+                        <td className="px-5 py-4">
+                          <span className="rounded-full bg-slate-800 px-2.5 py-1 text-sm font-medium capitalize text-slate-300">
+                            {channel.stream_type}
+                          </span>
+                        </td>
+
+                        <td className="px-5 py-4 text-sm text-slate-300">
+                          {category?.name ?? "Unknown"}
+                        </td>
+
+                        <td className="px-5 py-4">
+                          {channel.enabled ? (
+                            <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-400">
+                              Enabled
+                            </span>
+                          ) : (
+                            <span className="rounded-full bg-red-500/10 px-2.5 py-1 text-xs font-medium text-red-400">
+                              Disabled
+                            </span>
+                          )}
+                        </td>
+
+                        <td className="px-5 py-4 text-right">
+                          <div className="flex justify-end gap-3">
+                            {/* Edit */}
+                            <button
+                              type="button"
+                              onClick={() => handleEdit(channel)}
+                              className="rounded-lg border border-cyan-500/30 px-3 py-1.5 text-sm font-medium text-cyan-400 transition hover:border-cyan-500/60 hover:bg-cyan-500/10 hover:text-cyan-300"
+                            >
+                              Edit
+                            </button>
+
+                            {/* Enable / Disable */}
+                            <button
+                              type="button"
+                              onClick={() => handleToggleEnabled(channel)}
+                              className={
+                                channel.enabled
+                                  ? "rounded-lg border border-amber-500/30 px-3 py-1.5 text-sm font-medium text-amber-400 transition hover:border-amber-500/60 hover:bg-amber-500/10 hover:text-amber-300"
+                                  : "rounded-lg border border-emerald-500/30 px-3 py-1.5 text-sm font-medium text-emerald-400 transition hover:border-emerald-500/60 hover:bg-emerald-500/10 hover:text-emerald-300"
+                              }
+                            >
+                              {channel.enabled ? "Disable" : "Enable"}
+                            </button>
+
+                            {/* Delete */}
+                            <button
+                              type="button"
+                              onClick={() => handleDelete(channel.id)}
+                              className="rounded-lg border border-red-500/30 px-3 py-1.5 text-sm font-medium text-red-400 transition hover:border-red-500/60 hover:bg-red-500/10 hover:text-red-300"
+                            >
+                              Delete
+                            </button>
                           </div>
-                        </div>
-                      </td>
-
-                      <td className="px-5 py-4 text-sm text-slate-300">
-                        {channel.streamId}
-                      </td>
-
-                      <td className="px-5 py-4">
-                        <span className="rounded-full bg-slate-800 px-2.5 py-1 text-xs font-medium capitalize text-slate-300">
-                          {channel.stream_type}
-                        </span>
-                      </td>
-
-                      <td className="px-5 py-4 text-sm text-slate-300">
-                        {category?.name ?? "Unknown"}
-                      </td>
-
-                      <td className="px-5 py-4">
-                        {channel.enabled ? (
-                          <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-400">
-                            Enabled
-                          </span>
-                        ) : (
-                          <span className="rounded-full bg-red-500/10 px-2.5 py-1 text-xs font-medium text-red-400">
-                            Disabled
-                          </span>
-                        )}
-                      </td>
-
-                      <td className="px-5 py-4 text-right">
-                        <div className="flex justify-end gap-3">
-                          {/* Edit */}
-                          <button
-                            type="button"
-                            onClick={() => handleEdit(channel)}
-                            className="rounded-lg border border-cyan-500/30 px-3 py-1.5 text-sm font-medium text-cyan-400 transition hover:border-cyan-500/60 hover:bg-cyan-500/10 hover:text-cyan-300"
-                          >
-                            Edit
-                          </button>
-
-                          {/* Enable / Disable */}
-                          <button
-                            type="button"
-                            onClick={() => handleToggleEnabled(channel)}
-                            className={
-                              channel.enabled
-                                ? "rounded-lg border border-amber-500/30 px-3 py-1.5 text-sm font-medium text-amber-400 transition hover:border-amber-500/60 hover:bg-amber-500/10 hover:text-amber-300"
-                                : "rounded-lg border border-emerald-500/30 px-3 py-1.5 text-sm font-medium text-emerald-400 transition hover:border-emerald-500/60 hover:bg-emerald-500/10 hover:text-emerald-300"
-                            }
-                          >
-                            {channel.enabled ? "Disable" : "Enable"}
-                          </button>
-
-                          {/* Delete */}
-                          <button
-                            type="button"
-                            onClick={() => handleDelete(channel.id)}
-                            className="rounded-lg border border-red-500/30 px-3 py-1.5 text-sm font-medium text-red-400 transition hover:border-red-500/60 hover:bg-red-500/10 hover:text-red-300"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
+                        </td>
+                      </tr>
+                    );
+                  })}
               </tbody>
             </table>
           </div>
